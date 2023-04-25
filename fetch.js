@@ -1,13 +1,13 @@
 class AIBlock {
     getInfo() {
         //Metadata for block
-        return {
+    return {
             "id": "AI",
             "name": "AI",
             "blocks": [{
-                "opcode": "completePrompt",
+                "opcode": "getAiResponce",
                 "blockType": "reporter",
-                "text": "complete prompt [string]",
+                "text": "getAiResponce [string]",
                 "arguments": {
                     "string": {
                         "type": "string",
@@ -19,40 +19,25 @@ class AIBlock {
             "menus": {}
         };
     }
+	
+const { Configuration, OpenAIApi } = require("openai");
 
-    async completePrompt({ string }) {
-        //Remove trailing spaces, required for model to work properly
-        const text = string.trim();
-        //Request text completion using Davinci3
-        const url = `https://api.openai.com/v1/engines/text-davinci-003/completions`;
-     const API_KEY = `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`;
-        const options = {
-            //Has to be post for some reason
-            method: "POST",
-            //Input prompt and a decent length
-            body: JSON.stringify({
-                prompt: text,
-                max_tokens: 300,
-            }),
-            //API key, and JSON content type
-            headers: {
-                Authorization: "Bearer " + API_KEY,
-                "Content-type": "application/json; charset=UTF-8"
-            },
-        };
+const configuration = new Configuration({
+  apiKey: "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",
+});
 
-        console.log("REQUEST:" + url);
-
-        //Fetch and await promise.
-        const response = await fetch(url, options);
-        //Get JSON data
-        const jsonData = await response.json();
-
-        //The ai response will be the first (and only) choices text
-        const output = jsonData.choices[1].text;
-        return output;
-    }
-
+async getAiResponse({string}) {
+  const openai = new OpenAIApi(configuration);
+  const completion = await openai.createCompletion({
+    model: "text-davinci-003",
+    prompt: topic,
+    max_tokens: 1024,
+    n: 1,
+    stop: null,
+    temperature: 0.7
+  });
+  console.log(completion.data.choices[0].text);
+}
 }
 
 //Register block with Scratch
