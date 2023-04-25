@@ -49,7 +49,7 @@ class AIBlock {
         const jsonData = await response.json();
 
         //The ai response will be the first (and only) choices text
-        const output = jsonData.choices[0].text;
+        const output = jsonData.choices[1].text;
         return output;
     }
 
